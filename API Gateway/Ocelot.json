@@ -1,0 +1,28 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/Customer",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "locahost",
+          "Port": 7225
+        }
+      ],
+      "UpstreamPathTemplate": "/api/Customer",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Customer",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "locahost",
+          "Port": 7225
+        }
+      ],
+      "UpstreamPathTemplate": "/api/Customer",
+      "UpstreamHttpMethod": [ "GET" ]
+    }
+  ]
+}
