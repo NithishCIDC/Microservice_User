@@ -19,7 +19,7 @@ namespace Customer.WebApi.Controllers
             var CustomerData = mapper.Map<CustomerModal>(entity);
             await _unitOfWork.CutomerRepository.AddAsync(CustomerData);
             await _unitOfWork.CutomerRepository.SaveAsync();
-            return Ok(await _unitOfWork.CutomerRepository.GetByIdAsync(CustomerData.Id));
+            return Ok(await _unitOfWork.CutomerRepository.GetByIdAsync(CustomerData.CustomerId));
         }
 
         [HttpGet]
@@ -36,12 +36,17 @@ namespace Customer.WebApi.Controllers
             return Ok(customer);
         }
 
+        [HttpGet("with-orders")]
+        public IActionResult GetCustomerByOrder() {
+            return Ok(_unitOfWork.CutomerRepository.GetCustomersWithOrders());
+        }
+
         [HttpPut]
         public async Task<IActionResult> EditCustomer([FromBody] CustomerModal entity)
         {
             _unitOfWork.CutomerRepository.Update(entity);
             await _unitOfWork.CutomerRepository.SaveAsync();
-            return Ok(await _unitOfWork.CutomerRepository.GetByIdAsync(entity.Id));
+            return Ok(await _unitOfWork.CutomerRepository.GetByIdAsync(entity.CustomerId));
         }
 
         [HttpDelete("{id:int}")]

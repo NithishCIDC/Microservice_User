@@ -12,6 +12,10 @@ namespace Customer.infrastructure.Repository
 {
     public class CustomerRepository(ApplicationDbContext _dbContext) : GenericRepository<CustomerModal>(_dbContext), ICustomerRepository
     {
-
+        public List<CustomerModal> GetCustomersWithOrders()
+        {
+            var customersWithOrders = _dbContext.Customer.Include(c => c.Orders).ToList();
+            return customersWithOrders;
+        }
     }
 }
