@@ -26,6 +26,15 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfwork>();
 
 #endregion
 
+#region AddHttpClient
+
+builder.Services.AddHttpClient("Product", options =>
+{
+    options.BaseAddress = new Uri("https://localhost:7115/api/");
+});
+
+#endregion
+
 builder.Services.AddAutoMapper(typeof(ApplicationMapper));
 
 builder.Services.AddControllers();

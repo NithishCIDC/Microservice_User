@@ -9,6 +9,6 @@ namespace Customer.Application.Interface
 {
     public interface ICustomerRepository : IGenericRepository<CustomerModal>
     {
-        List<CustomerModal> GetCustomersWithOrders();
+        //List<CustomerModal> GetCustomersWithOrders();
     }
 }
