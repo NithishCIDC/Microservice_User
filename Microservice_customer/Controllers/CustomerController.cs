@@ -3,13 +3,13 @@ using Customer.Application.DTO;
 using Customer.Domain.Modal;
 using Microsoft.AspNetCore.Mvc;
 using Customer.Application.Interface;
-using System.Text.Json;
+using Customer.infrastructure.Repository;
 
 namespace Customer.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CustomerController(IUnitOfWork _unitOfWork, IMapper mapper,IHttpClientFactory _httpClient) : ControllerBase
+    public class CustomerController(IUnitOfWork _unitOfWork, IMapper mapper) : ControllerBase
     {
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -35,29 +35,59 @@ namespace Customer.WebApi.Controllers
             return Ok(customer);
         }
 
-        //[HttpGet("with-orders")]
-        //public IActionResult GetCustomerByOrder() {
-        //    return Ok(_unitOfWork.CutomerRepository.GetCustomersWithOrders());
-        //}
-
         [HttpGet("WithProduct")]
-        public async Task<IActionResult> GetWithProduct() {
-            var client = _httpClient.CreateClient("Product");
-            var productData = await client.GetFromJsonAsync<List<ProductDTO>>("Product");
+        public async Task<IActionResult> GetWithProduct()
+        {
+            try
+            {
+                var productData = await _unitOfWork.ProductService.GetProduct();
+                var customer = await _unitOfWork.CutomerRepository.GetAllAsync();
 
-            var customer = await _unitOfWork.CutomerRepository.GetAllAsync();
+                var combinedData = customer.Select(customer => new
+                {
+                    customer.CustomerId,
+                    customer.CustomerName,
+                    CustomerAddress = customer.Address,
+                    Products = productData.Where(product => product.CustomerId == customer.CustomerId).Select(product => new
+                    {
+                        product.ProductId,
+                        product.ProductName,
+                    })
+                });
 
-            var combinedData = customer.Select(customer => new {
-                CustomerId = customer.CustomerId,
-                CustomerName = customer.CustomerName,
-                CustomerAddress = customer.Address,
-                Products = productData.Where(product => (int)product.CustomerId == customer.CustomerId).Select(product => new {
-                    ProductId = (int)product.ProductId,
-                    ProductName = (string)product.ProductName,
-                })
-            });
+                return Ok(combinedData);
+            }
+            catch (Exception ex) { return BadRequest(new { ErrorMessage = "Product Database is not connected" }); }
 
-            return Ok(combinedData);
+
+        }
+
+        [HttpGet("WithProduct/{id}")]
+        public async Task<IActionResult> GetCustomerwithOrder(int id)
+        {
+            try
+            {
+                var productData = await _unitOfWork.ProductService.GetProductByCID(id);
+                var customer = await _unitOfWork.CutomerRepository.GetByIdAsync(id);
+
+                var combinedData = new
+                {
+                    customer.CustomerId,
+                    customer.CustomerName,
+                    CustomerAddress = customer.Address,
+                    product = productData.Select(product => new
+                    {
+                        product.ProductId,
+                        product.ProductName,
+                    })
+
+                };
+                return Ok(combinedData);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ErrorMessage = "Product Database is not connected" });
+            }
         }
 
         [HttpPut]
@@ -76,9 +106,17 @@ namespace Customer.WebApi.Controllers
             {
                 return NotFound(new { message = "Customer not found" });
             }
-
-            _unitOfWork.CutomerRepository.Delete(entity);
-            await _unitOfWork.CutomerRepository.SaveAsync();
+            try
+            {
+                _unitOfWork.CutomerRepository.Delete(entity);
+                _unitOfWork.ProductService.DeleteProduct(id);
+                await _unitOfWork.CutomerRepository.SaveAsync();
+            }
+            catch (Exception ex) 
+            {
+                return BadRequest(new { message = "Something went wrong" });
+            }
+            
 
             return Ok(new { message = "Customer deleted successfully" });
         }

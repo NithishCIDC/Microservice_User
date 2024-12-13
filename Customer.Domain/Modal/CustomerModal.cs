@@ -11,7 +11,5 @@ namespace Customer.Domain.Modal
         public string PostalCode { get; set; } = string.Empty;
         public string Country { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
-        //public ICollection<OrderModal> Orders { get; set; }
-
     }
 }

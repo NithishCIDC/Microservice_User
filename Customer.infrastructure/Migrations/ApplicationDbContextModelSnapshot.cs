@@ -53,39 +53,6 @@ namespace Customer.infrastructure.Migrations
 
                     b.ToTable("Customer");
                 });
-
-            modelBuilder.Entity("Customer.Domain.Modal.OrderModal", b =>
-                {
-                    b.Property<int>("OrderId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ProductName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("OrderId");
-
-                    b.HasIndex("CustomerId");
-
-                    b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("Customer.Domain.Modal.OrderModal", b =>
-                {
-                    b.HasOne("Customer.Domain.Modal.CustomerModal", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-                });
 #pragma warning restore 612, 618
         }
     }
