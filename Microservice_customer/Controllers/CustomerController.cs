@@ -63,7 +63,7 @@ namespace Customer.WebApi.Controllers
         }
 
         [HttpGet("WithProduct/{id}")]
-        public async Task<IActionResult> GetCustomerwithOrder(int id)
+        public async Task<IActionResult> GetCustomerwithProduct(int id)
         {
             try
             {
