@@ -9,6 +9,6 @@ namespace Customer.Application.Interface
 {
     public interface ICustomerRepository : IGenericRepository<CustomerModal>
     {
-        
+        Task<bool> GetByEmail(string email, string password);
     }
 }

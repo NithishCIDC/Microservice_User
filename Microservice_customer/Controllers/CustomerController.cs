@@ -4,9 +4,11 @@ using Customer.Domain.Modal;
 using Microsoft.AspNetCore.Mvc;
 using Customer.Application.Interface;
 using Customer.infrastructure.Repository;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Customer.WebApi.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CustomerController(IUnitOfWork _unitOfWork, IMapper mapper) : ControllerBase
@@ -112,11 +114,11 @@ namespace Customer.WebApi.Controllers
                 _unitOfWork.ProductService.DeleteProduct(id);
                 await _unitOfWork.CutomerRepository.SaveAsync();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 return BadRequest(new { message = "Something went wrong" });
             }
-            
+
 
             return Ok(new { message = "Customer deleted successfully" });
         }

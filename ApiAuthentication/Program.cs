@@ -1,7 +1,4 @@
-using Customer.Application.Interface;
-using Customer.Application.Mapper;
-using Customer.infrastructure.Data;
-using Customer.infrastructure.Repository;
+using ApiAuthentication.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -19,22 +16,6 @@ builder.Services.AddCors(options => options.AddPolicy("CORS_Policy", policy => p
 #region Database Connection
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-#endregion
-
-#region Generics and Unit of work
-
-builder.Services.AddTransient(typeof(IGenericRepository<>),typeof(GenericRepository<>));
-builder.Services.AddScoped<IUnitOfWork, UnitOfwork>();
-
-#endregion
-
-#region AddHttpClient
-
-builder.Services.AddHttpClient("Product", options =>
-{
-    options.BaseAddress = new Uri("https://localhost:7115/api/");
-});
 
 #endregion
 
@@ -61,8 +42,6 @@ builder.Services.AddAuthentication(options =>
 
 #endregion
 
-builder.Services.AddAutoMapper(typeof(ApplicationMapper));
-
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -75,11 +54,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseCors("CORS_Policy");
-
 app.UseHttpsRedirection();
 
-app.UseAuthentication();
+app.UseCors("CORS_Policy");
 
 app.UseAuthorization();
 

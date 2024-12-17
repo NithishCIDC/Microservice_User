@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Customer.Domain.Modal
+namespace ApiAuthentication.Model
 {
     public class CustomerModal
     {

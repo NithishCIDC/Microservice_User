@@ -1,0 +1,6 @@
+services:
+  customer.webapi:
+    image: ${DOCKER_REGISTRY-}customerwebapi
+    build:
+      context: .
+      dockerfile: Microservice_customer/Dockerfile
