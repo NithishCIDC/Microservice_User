@@ -1,6 +1,6 @@
-﻿namespace Customer.Application.DTO
+﻿namespace User.Application.DTO
 {
-    public class CustomerDTO
+    public class UserDTO
     {
         public string Name { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;

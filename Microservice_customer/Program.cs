@@ -1,11 +1,11 @@
-using Customer.Application.Interface;
-using Customer.Application.Mapper;
-using Customer.infrastructure.Data;
-using Customer.infrastructure.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using User.Application.Interface;
+using User.Application.Mapper;
+using User.infrastructure.Data;
+using User.infrastructure.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,11 +40,7 @@ builder.Services.AddHttpClient("Product", options =>
 
 #region JWT_AUTH
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
    .AddJwtBearer(options =>
    {
        options.TokenValidationParameters = new TokenValidationParameters

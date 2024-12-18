@@ -1,12 +1,12 @@
-﻿using Customer.Application.Interface;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using User.Application.Interface;
 
-namespace Customer.infrastructure.Repository
+namespace User.infrastructure.Repository
 {
     public class GenericRepository<T>(DbContext context) : IGenericRepository<T> where T : class
     {

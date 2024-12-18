@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
-using Customer.Application.DTO;
-using Customer.Domain.Modal;
+using User.Application.DTO;
+using User.Domain.Modal;
 
-namespace Customer.Application.Mapper
+namespace User.Application.Mapper
 {
     public class ApplicationMapper : Profile
     {
         public ApplicationMapper()
         {
-            CreateMap<CustomerDTO, CustomerModal>();
+            CreateMap<UserDTO, UserModal>();
         }
     }
 }

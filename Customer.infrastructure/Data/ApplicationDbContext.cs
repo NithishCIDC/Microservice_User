@@ -1,10 +1,10 @@
-﻿using Customer.Domain.Modal;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using User.Domain.Modal;
 
-namespace Customer.infrastructure.Data
+namespace User.infrastructure.Data
 {
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
     {
-        public DbSet<CustomerModal> Customer { get; set; }
+        public DbSet<UserModal> Customer { get; set; }
     }
 }

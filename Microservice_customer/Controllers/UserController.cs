@@ -1,23 +1,22 @@
 ﻿using AutoMapper;
-using Customer.Application.DTO;
-using Customer.Domain.Modal;
 using Microsoft.AspNetCore.Mvc;
-using Customer.Application.Interface;
-using Customer.infrastructure.Repository;
 using Microsoft.AspNetCore.Authorization;
+using User.Domain.Modal;
+using User.Application.Interface;
+using User.Application.DTO;
 
-namespace Customer.WebApi.Controllers
+namespace User.WebApi.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class CustomerController(IUnitOfWork _unitOfWork, IMapper mapper) : ControllerBase
+    public class UserController(IUnitOfWork _unitOfWork, IMapper mapper) : ControllerBase
     {
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> AddCustomer([FromBody] CustomerDTO entity)
+        public async Task<IActionResult> AddCustomer([FromBody] UserDTO entity)
         {
-            var CustomerData = mapper.Map<CustomerModal>(entity);
+            var CustomerData = mapper.Map<UserModal>(entity);
             await _unitOfWork.CutomerRepository.AddAsync(CustomerData);
             await _unitOfWork.CutomerRepository.SaveAsync();
             return Ok(await _unitOfWork.CutomerRepository.GetByIdAsync(CustomerData.CustomerId));
@@ -93,7 +92,7 @@ namespace Customer.WebApi.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> EditCustomer([FromBody] CustomerModal entity)
+        public async Task<IActionResult> EditCustomer([FromBody] UserModal entity)
         {
             _unitOfWork.CutomerRepository.Update(entity);
             await _unitOfWork.CutomerRepository.SaveAsync();

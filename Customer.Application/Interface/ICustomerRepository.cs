@@ -1,13 +1,13 @@
-﻿using Customer.Domain.Modal;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using User.Domain.Modal;
 
-namespace Customer.Application.Interface
+namespace User.Application.Interface
 {
-    public interface ICustomerRepository : IGenericRepository<CustomerModal>
+    public interface ICustomerRepository : IGenericRepository<UserModal>
     {
         Task<bool> GetByEmail(string email, string password);
     }

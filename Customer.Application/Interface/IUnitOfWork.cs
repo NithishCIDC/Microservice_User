@@ -1,4 +1,4 @@
-﻿namespace Customer.Application.Interface
+﻿namespace User.Application.Interface
 {
     public interface IUnitOfWork
     {

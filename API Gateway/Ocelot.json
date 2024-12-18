@@ -4,24 +4,24 @@
       "UpstreamPathTemplate": "/login",
       "UpstreamHttpMethod": [ "POST" ],
       "DownstreamPathTemplate": "/api/auth/login",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7001
+          "Port": 5001
         }
       ]
     },
 
     {
-      "UpstreamPathTemplate": "/customer",
+      "UpstreamPathTemplate": "/user",
       "UpstreamHttpMethod": [ "GET", "POST" ],
-      "DownstreamPathTemplate": "/api/Customer",
-      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/user",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7002
+          "Port": 5002
         }
       ],
       "AuthenticationOptions": {
@@ -31,14 +31,14 @@
     },
 
     {
-      "UpstreamPathTemplate": "/customer/{id}",
+      "UpstreamPathTemplate": "/user/{id}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
-      "DownstreamPathTemplate": "/api/Customer",
-      "DownstreamScheme": "https",
+      "DownstreamPathTemplate": "/api/user",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7002
+          "Port": 5002
         }
       ],
       "AuthenticationOptions": {

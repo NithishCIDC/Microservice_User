@@ -1,6 +1,4 @@
-﻿using Customer.Application.DTO;
-using Customer.Application.Interface;
-using Microsoft.Identity.Client;
+﻿using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Http.Json;
 using Microsoft.VisualBasic;
+using User.Application.DTO;
+using User.Application.Interface;
 
-namespace Customer.infrastructure.Repository
+namespace User.infrastructure.Repository
 {
     public class ProductService(IHttpClientFactory _httpClient) : IProductService
     {

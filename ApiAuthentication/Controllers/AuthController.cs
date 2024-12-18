@@ -1,6 +1,5 @@
 ﻿using ApiAuthentication.Data;
 using ApiAuthentication.Model;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -17,16 +16,16 @@ namespace ApiAuthentication.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel entity)
         {
-            var user = await dbContext.Customer.AnyAsync(customer => customer.Email == entity.Email && customer.Password == entity.Password);
+            var user = await dbContext.Customer.FirstOrDefaultAsync(customer => customer.Email == entity.Email && customer.Password == entity.Password);
 
-            if (user)
+            if (user is not null)
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!);
 
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
-                    Subject = new ClaimsIdentity([new Claim(ClaimTypes.Name, entity.Email)]),
+                    Subject = new ClaimsIdentity([new Claim(ClaimTypes.Email, entity.Email), new Claim(ClaimTypes.Role, user.Role)]),
                     Expires = DateTime.Now.AddMinutes(60),
                     Issuer = configuration["Jwt:Issuer"]!,
                     Audience = configuration["Jwt:Audience"]!,
