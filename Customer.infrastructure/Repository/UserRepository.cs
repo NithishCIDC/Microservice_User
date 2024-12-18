@@ -10,7 +10,7 @@ using User.infrastructure.Data;
 
 namespace User.infrastructure.Repository
 {
-    public class CustomerRepository(ApplicationDbContext _dbContext) : GenericRepository<UserModal>(_dbContext), ICustomerRepository
+    public class UserRepository(ApplicationDbContext _dbContext) : GenericRepository<UserModal>(_dbContext), IUserRepository
     {
         public async Task<bool> GetByEmail(string email, string password)
         {

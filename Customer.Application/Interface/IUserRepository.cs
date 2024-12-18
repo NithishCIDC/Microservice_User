@@ -7,7 +7,7 @@ using User.Domain.Modal;
 
 namespace User.Application.Interface
 {
-    public interface ICustomerRepository : IGenericRepository<UserModal>
+    public interface IUserRepository : IGenericRepository<UserModal>
     {
         Task<bool> GetByEmail(string email, string password);
     }

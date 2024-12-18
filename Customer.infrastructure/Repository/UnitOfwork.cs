@@ -11,7 +11,7 @@ namespace User.infrastructure.Repository
 {
     public class UnitOfwork(ApplicationDbContext _dbContext, IHttpClientFactory httpClient) : IUnitOfWork
     {
-        public ICustomerRepository CutomerRepository { get; private set; } = new CustomerRepository(_dbContext);
+        public IUserRepository CutomerRepository { get; private set; } = new UserRepository(_dbContext);
 
         public IProductService ProductService { get; private set; } = new ProductService(httpClient);
     }
