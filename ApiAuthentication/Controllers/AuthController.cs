@@ -16,7 +16,7 @@ namespace ApiAuthentication.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel entity)
         {
-            var user = await dbContext.Customer.FirstOrDefaultAsync(customer => customer.Email == entity.Email && customer.Password == entity.Password);
+            var user = await dbContext.User.FirstOrDefaultAsync(customer => customer.Email == entity.Email && customer.Password == entity.Password);
 
             if (user is not null)
             {

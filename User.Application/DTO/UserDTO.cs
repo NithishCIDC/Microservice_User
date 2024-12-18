@@ -2,7 +2,9 @@
 {
     public class UserDTO
     {
-        public string Name { get; set; } = string.Empty;
+        public required string Username { get; set; }
+        public required string Email { get; set; }
+        public required string Password { get; set; }
         public string Address { get; set; } = string.Empty;
         public string PostalCode { get; set; } = string.Empty;
         public string Country { get; set; } = string.Empty;

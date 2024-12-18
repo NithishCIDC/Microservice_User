@@ -5,7 +5,7 @@ namespace ApiAuthentication.Data
 {
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
     {
-        public DbSet<UserModal> Customer { get; set; }
+        public DbSet<UserModal> User { get; set; }
     }
 
 

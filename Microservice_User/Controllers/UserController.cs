@@ -7,7 +7,7 @@ using User.Application.DTO;
 
 namespace User.WebApi.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController(IUnitOfWork _unitOfWork, IMapper mapper) : ControllerBase
@@ -19,7 +19,7 @@ namespace User.WebApi.Controllers
             var CustomerData = mapper.Map<UserModal>(entity);
             await _unitOfWork.CutomerRepository.AddAsync(CustomerData);
             await _unitOfWork.CutomerRepository.SaveAsync();
-            return Ok(await _unitOfWork.CutomerRepository.GetByIdAsync(CustomerData.CustomerId));
+            return Ok(await _unitOfWork.CutomerRepository.GetByIdAsync(CustomerData.UserId));
         }
 
         [HttpGet]
@@ -46,10 +46,10 @@ namespace User.WebApi.Controllers
 
                 var combinedData = customer.Select(customer => new
                 {
-                    customer.CustomerId,
-                    customer.CustomerName,
+                    customer.UserId,
+                    customer.Username,
                     CustomerAddress = customer.Address,
-                    Products = productData.Where(product => product.CustomerId == customer.CustomerId).Select(product => new
+                    Products = productData.Where(product => product.CustomerId == customer.UserId).Select(product => new
                     {
                         product.ProductId,
                         product.ProductName,
@@ -73,8 +73,8 @@ namespace User.WebApi.Controllers
 
                 var combinedData = new
                 {
-                    customer.CustomerId,
-                    customer.CustomerName,
+                    customer.UserId,
+                    customer.Username,
                     CustomerAddress = customer.Address,
                     product = productData.Select(product => new
                     {
@@ -96,7 +96,7 @@ namespace User.WebApi.Controllers
         {
             _unitOfWork.CutomerRepository.Update(entity);
             await _unitOfWork.CutomerRepository.SaveAsync();
-            return Ok(await _unitOfWork.CutomerRepository.GetByIdAsync(entity.CustomerId));
+            return Ok(await _unitOfWork.CutomerRepository.GetByIdAsync(entity.UserId));
         }
 
         [HttpDelete("{id:int}")]
@@ -105,7 +105,7 @@ namespace User.WebApi.Controllers
             var entity = await _unitOfWork.CutomerRepository.GetByIdAsync(id);
             if (entity == null)
             {
-                return NotFound(new { message = "Customer not found" });
+                return NotFound(new { message = "User not found" });
             }
             try
             {
@@ -119,7 +119,7 @@ namespace User.WebApi.Controllers
             }
 
 
-            return Ok(new { message = "Customer deleted successfully" });
+            return Ok(new { message = "User deleted successfully" });
         }
 
     }

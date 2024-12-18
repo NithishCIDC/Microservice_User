@@ -14,7 +14,7 @@ namespace User.infrastructure.Repository
     {
         public async Task<bool> GetByEmail(string email, string password)
         {
-            var customer = await _dbContext.Customer.Where(cutomer => cutomer.Email == email).FirstOrDefaultAsync();
+            var customer = await _dbContext.User.Where(cutomer => cutomer.Email == email).FirstOrDefaultAsync();
             if (customer == null) return false;
             if (customer.Password != password) return false;
             return true;
