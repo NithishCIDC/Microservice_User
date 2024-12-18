@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User.WebApi", "Microservice_customer\User.WebApi.csproj", "{7C5A44B4-C0ED-4F07-86AA-20CA486ACE54}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User.WebApi", "Microservice_User\User.WebApi.csproj", "{7C5A44B4-C0ED-4F07-86AA-20CA486ACE54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User.Domain", "Customer.Domain\User.Domain.csproj", "{36A51CAC-F67D-4D7B-A780-BD0C3A681BF0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User.Domain", "User.Domain\User.Domain.csproj", "{36A51CAC-F67D-4D7B-A780-BD0C3A681BF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User.infrastructure", "Customer.infrastructure\User.infrastructure.csproj", "{D40A819F-4B32-4A28-9F71-4EFF51381043}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User.infrastructure", "User.infrastructure\User.infrastructure.csproj", "{D40A819F-4B32-4A28-9F71-4EFF51381043}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User.Application", "Customer.Application\User.Application.csproj", "{5B705F11-C621-450D-96F6-99A8D7852C37}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User.Application", "User.Application\User.Application.csproj", "{5B705F11-C621-450D-96F6-99A8D7852C37}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API Gateway", "API Gateway\API Gateway.csproj", "{EAD24C75-F899-4A9F-B314-9C6F70557CFA}"
 EndProject
