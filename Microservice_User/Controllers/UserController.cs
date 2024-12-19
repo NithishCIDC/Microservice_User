@@ -7,7 +7,7 @@ using User.Application.DTO;
 
 namespace User.WebApi.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController(IUnitOfWork _unitOfWork, IMapper mapper) : ControllerBase
