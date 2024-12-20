@@ -1,49 +1,47 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using User.Domain.Modal;
 using User.Application.Interface;
 using User.Application.DTO;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using User.infrastructure.Repository;
+using Mapster;
 
 namespace User.WebApi.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController(IUnitOfWork _unitOfWork, IMapper mapper) : ControllerBase
+    public class UserController(IUnitOfWork _unitOfWork) : ControllerBase
     {
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> AddCustomer([FromBody] UserDTO entity)
+        public async Task<IActionResult> AddUser([FromBody] UserDTO entity)
         {
             if (await _unitOfWork.CutomerRepository.IsEmailRegistered(entity.Email))
             {
-                var CustomerData = mapper.Map<UserModal>(entity);
-                await _unitOfWork.CutomerRepository.AddAsync(CustomerData);
+                var UserData = entity.Adapt<UserModal>();
+                await _unitOfWork.CutomerRepository.AddAsync(UserData);
                 await _unitOfWork.CutomerRepository.SaveAsync();
-                return Ok(CustomerData);
+                return Ok(UserData);
             }
             return BadRequest(new ErrorMessageDTO { Error = "Email already registered" });
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCustomer()
+        public async Task<IActionResult> GetUser()
         {
             var customer = await _unitOfWork.CutomerRepository.GetAllAsync();
             return Ok(customer);
         }
 
         [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetCustomerByID(int id)
+        public async Task<IActionResult> GetUserByID(int id)
         {
-            var customer = await _unitOfWork.CutomerRepository.GetByIdAsync(id);
-            if (customer == null)
+            var User = await _unitOfWork.CutomerRepository.GetByIdAsync(id);
+            if (User == null)
             {
                 return NotFound(new ErrorMessageDTO { Error = "User not found" });
             }
-            return Ok(customer);
+            return Ok(User);
         }
 
         [HttpGet("WithProduct")]
@@ -74,7 +72,7 @@ namespace User.WebApi.Controllers
         }
 
         [HttpGet("WithProduct/{id}")]
-        public async Task<IActionResult> GetCustomerwithProduct(int id)
+        public async Task<IActionResult> GetUserwithProduct(int id)
         {
             try
             {
@@ -102,15 +100,22 @@ namespace User.WebApi.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> EditCustomer([FromBody] UserModal entity)
+        public async Task<IActionResult> EditUser([FromBody] UserModal entity)
         {
-            _unitOfWork.CutomerRepository.Update(entity);
-            await _unitOfWork.CutomerRepository.SaveAsync();
-            return Ok(await _unitOfWork.CutomerRepository.GetByIdAsync(entity.UserId));
+            try
+            {
+                _unitOfWork.CutomerRepository.Update(entity);
+                await _unitOfWork.CutomerRepository.SaveAsync();
+                return Ok(entity);
+            }
+            catch (Exception)
+            {
+                return BadRequest(new ErrorMessageDTO { Error = "Something went wrong, while updating User" });
+            }
         }
 
         [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeleteCustomer(int id)
+        public async Task<IActionResult> DeleteUser(int id)
         {
             var entity = await _unitOfWork.CutomerRepository.GetByIdAsync(id);
             if (entity == null)

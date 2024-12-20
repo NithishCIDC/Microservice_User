@@ -1,47 +1,46 @@
-﻿using Xunit;
-using Moq;
-using System.Threading.Tasks;
+﻿using Moq;
 using Microsoft.AspNetCore.Mvc;
 using User.Application.Interface;
 using User.Application.DTO;
 using User.Domain.Modal;
 using User.WebApi.Controllers;
-using AutoMapper;
-using System.Collections.Generic;
+using Castle.Core.Resource;
 
 namespace User.UnitTests
 {
     public class UserControllerTests
     {
         private readonly Mock<IUnitOfWork> _mockUnitOfWork;
-        private readonly Mock<IMapper> _mockMapper;
         private readonly UserController _controller;
 
         public UserControllerTests()
         {
             _mockUnitOfWork = new Mock<IUnitOfWork>();
-            _mockMapper = new Mock<IMapper>();
-            _controller = new UserController(_mockUnitOfWork.Object, _mockMapper.Object);
+            _controller = new UserController(_mockUnitOfWork.Object);
         }
         [Fact]
         public async Task AddCustomer_ReturnsOk_WhenEmailNotRegistered()
         {
             // Arrange
             var userDto = new UserDTO { Username = "TestUser", Email = "test@example.com", Password = "Password123", Address = "TestAddress" };
-            var userModal = new UserModal { UserId = 1, Username = "User1", Email = "user1@example.com", Password = "Password123", Address = "Address1" }; // Example mapped entity
+            var userModal = new UserModal { UserId = 1, Username = "TestUser", Email = "test@example.com", Password = "Password123", Address = "TestAddress" };
 
             // Mocking the repository to return false for IsEmailRegistered, indicating that the email is not registered
             _mockUnitOfWork.Setup(u => u.CutomerRepository.IsEmailRegistered(userDto.Email)).ReturnsAsync(true);
-            _mockMapper.Setup(m => m.Map<UserModal>(userDto)).Returns(userModal); // Mocking mapping
+
+            // Mock the repository methods for adding and saving the customer
+            _mockUnitOfWork.Setup(u => u.CutomerRepository.AddAsync(It.IsAny<UserModal>())).Returns(Task.CompletedTask);
+            _mockUnitOfWork.Setup(u => u.CutomerRepository.SaveAsync()).Returns(Task.CompletedTask);
 
             // Act
-            var result = await _controller.AddCustomer(userDto);
+            var result = await _controller.AddUser(userDto);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var returnedValue = Assert.IsType<UserModal>(okResult.Value);
-            Assert.Equal(userModal.Email, returnedValue.Email); 
+            Assert.Equal(userModal.Email, returnedValue.Email);
         }
+
 
         [Fact]
         public async Task AddCustomer_ReturnsBadRequest_WhenEmailAlreadyRegistered()
@@ -53,11 +52,11 @@ namespace User.UnitTests
             _mockUnitOfWork.Setup(u => u.CutomerRepository.IsEmailRegistered(userDto.Email)).ReturnsAsync(false);
 
             // Act
-            var result = await _controller.AddCustomer(userDto);
+            var result = await _controller.AddUser(userDto);
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            var returnedValue = Assert.IsType<ErrorMessageDTO>(badRequestResult.Value); 
+            var returnedValue = Assert.IsType<ErrorMessageDTO>(badRequestResult.Value);
             Assert.Equal("Email already registered", returnedValue.Error);
         }
 
@@ -74,7 +73,7 @@ namespace User.UnitTests
             _mockUnitOfWork.Setup(u => u.CutomerRepository.GetAllAsync()).ReturnsAsync(customers);
 
             // Act
-            var result = await _controller.GetCustomer();
+            var result = await _controller.GetUser();
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -91,12 +90,41 @@ namespace User.UnitTests
             _mockUnitOfWork.Setup(u => u.CutomerRepository.GetByIdAsync(1)).ReturnsAsync(customer);
 
             // Act
-            var result = await _controller.GetCustomerByID(1);
+            var result = await _controller.GetUserByID(1);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var returnedCustomer = Assert.IsType<UserModal>(okResult.Value);
             Assert.Equal(customer.UserId, returnedCustomer.UserId);
+        }
+
+        [Fact]
+        public async Task GetCustomerByID_Returns_NotFoundResult()
+        {
+            // Arrange
+            _mockUnitOfWork.Setup(u => u.CutomerRepository.GetByIdAsync(2)).ReturnsAsync((UserModal)null);
+
+            // Act
+            var result = await _controller.GetUserByID(1);
+
+            // Assert
+            var Result = Assert.IsType<NotFoundObjectResult>(result);
+            var returnedCustomer = Assert.IsType<ErrorMessageDTO>(Result.Value);
+            Assert.Equal("User not found", returnedCustomer.Error);
+        }
+
+        [Fact]
+        public async Task Update_User_returnsOkObjectResult()
+        {
+            // Arrange
+            var user = new UserModal { UserId = 1, Username = "User1", Email = "user1@example.com", Password = "Password123", Address = "Address1" };
+
+            _mockUnitOfWork.Setup(u => u.CutomerRepository.Update(user));
+
+            var result = await _controller.EditUser(user);
+
+            var Result = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(user, Result.Value);
         }
 
         [Fact]
@@ -111,12 +139,12 @@ namespace User.UnitTests
             _mockUnitOfWork.Setup(u => u.CutomerRepository.SaveAsync()).Returns(Task.CompletedTask);
 
             // Act
-            var result = await _controller.DeleteCustomer(1);
+            var result = await _controller.DeleteUser(1);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var returnedValue = Assert.IsType<string>(okResult.Value);
-            Assert.Equal( "User deleted successfully", returnedValue);
+            Assert.Equal("User deleted successfully", returnedValue);
         }
 
         [Fact]
@@ -126,11 +154,11 @@ namespace User.UnitTests
             _mockUnitOfWork.Setup(u => u.CutomerRepository.GetByIdAsync(1)).ReturnsAsync((UserModal)null);
 
             // Act
-            var result = await _controller.DeleteCustomer(1);
+            var result = await _controller.DeleteUser(1);
 
             // Assert
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
-            var returnedValue = Assert.IsType <ErrorMessageDTO>( notFoundResult.Value); // Using dynamic
+            var returnedValue = Assert.IsType<ErrorMessageDTO>(notFoundResult.Value); // Using dynamic
             Assert.Equal("User not found", returnedValue.Error);
         }
     }
