@@ -20,7 +20,7 @@ namespace User.WebApi.Controllers
             var CustomerData = mapper.Map<UserModal>(entity);
             await _unitOfWork.CutomerRepository.AddAsync(CustomerData);
             await _unitOfWork.CutomerRepository.SaveAsync();
-            return Ok(await _unitOfWork.CutomerRepository.GetByIdAsync(CustomerData.UserId));
+            return Ok(new { MEssage="User created successfully", CustomerData });
         }
 
         [HttpGet]
@@ -124,7 +124,7 @@ namespace User.WebApi.Controllers
             }
 
 
-            return Ok(new ErrorMessageDTO { Message = "User deleted successfully" });
+            return Ok("User deleted successfully");
         }
 
     }

@@ -8,7 +8,6 @@ namespace User.Application.DTO
 {
     public class ErrorMessageDTO
     {
-        public string Message { get; set; }
         public string Error { get; set; }
     }
 }
