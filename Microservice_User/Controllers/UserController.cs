@@ -5,6 +5,7 @@ using User.Domain.Modal;
 using User.Application.Interface;
 using User.Application.DTO;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using User.infrastructure.Repository;
 
 namespace User.WebApi.Controllers
 {
@@ -17,10 +18,14 @@ namespace User.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> AddCustomer([FromBody] UserDTO entity)
         {
-            var CustomerData = mapper.Map<UserModal>(entity);
-            await _unitOfWork.CutomerRepository.AddAsync(CustomerData);
-            await _unitOfWork.CutomerRepository.SaveAsync();
-            return Ok(new { MEssage="User created successfully", CustomerData });
+            if (await _unitOfWork.CutomerRepository.IsEmailRegistered(entity.Email))
+            {
+                var CustomerData = mapper.Map<UserModal>(entity);
+                await _unitOfWork.CutomerRepository.AddAsync(CustomerData);
+                await _unitOfWork.CutomerRepository.SaveAsync();
+                return Ok(new { Message = "User created successfully", CustomerData });
+            }
+            return BadRequest(new ErrorMessageDTO { Error = "Email already registered" });
         }
 
         [HttpGet]
@@ -63,7 +68,7 @@ namespace User.WebApi.Controllers
 
                 return Ok(combinedData);
             }
-            catch (Exception ex) { return BadRequest(new ErrorMessageDTO { Error = "Product Database is not connected" }); }
+            catch (Exception) { return BadRequest(new ErrorMessageDTO { Error = "Product Database is not connected" }); }
 
 
         }
@@ -90,7 +95,7 @@ namespace User.WebApi.Controllers
                 };
                 return Ok(combinedData);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return BadRequest(new ErrorMessageDTO { Error = "Product Database is not connected" });
             }
@@ -118,7 +123,7 @@ namespace User.WebApi.Controllers
                 _unitOfWork.ProductService.DeleteProduct(id);
                 await _unitOfWork.CutomerRepository.SaveAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return BadRequest(new ErrorMessageDTO { Error = "Something went wrong" });
             }

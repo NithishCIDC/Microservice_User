@@ -9,6 +9,6 @@ namespace User.Application.Interface
 {
     public interface IUserRepository : IGenericRepository<UserModal>
     {
-        Task<bool> GetByEmail(string email, string password);
+        Task<bool> IsEmailRegistered(string email);
     }
 }

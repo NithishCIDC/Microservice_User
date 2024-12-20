@@ -12,12 +12,10 @@ namespace User.infrastructure.Repository
 {
     public class UserRepository(ApplicationDbContext _dbContext) : GenericRepository<UserModal>(_dbContext), IUserRepository
     {
-        public async Task<bool> GetByEmail(string email, string password)
+        public async Task<bool> IsEmailRegistered(string email)
         {
-            var customer = await _dbContext.User.Where(cutomer => cutomer.Email == email).FirstOrDefaultAsync();
-            if (customer == null) return false;
-            if (customer.Password != password) return false;
-            return true;
+            var IsRegistered = await _dbContext.User.AnyAsync(cutomer => cutomer.Email == email);
+            return IsRegistered;
         }
     }
 }
