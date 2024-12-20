@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using User.Domain.Modal;
 using User.Application.Interface;
 using User.Application.DTO;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace User.WebApi.Controllers
 {
@@ -33,6 +34,10 @@ namespace User.WebApi.Controllers
         public async Task<IActionResult> GetCustomerByID(int id)
         {
             var customer = await _unitOfWork.CutomerRepository.GetByIdAsync(id);
+            if (customer == null)
+            {
+                return NotFound(new ErrorMessageDTO { Error = "User not found" });
+            }
             return Ok(customer);
         }
 
@@ -58,7 +63,7 @@ namespace User.WebApi.Controllers
 
                 return Ok(combinedData);
             }
-            catch (Exception ex) { return BadRequest(new { ErrorMessage = "Product Database is not connected" }); }
+            catch (Exception ex) { return BadRequest(new ErrorMessageDTO { Error = "Product Database is not connected" }); }
 
 
         }
@@ -87,7 +92,7 @@ namespace User.WebApi.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { ErrorMessage = "Product Database is not connected" });
+                return BadRequest(new ErrorMessageDTO { Error = "Product Database is not connected" });
             }
         }
 
@@ -105,7 +110,7 @@ namespace User.WebApi.Controllers
             var entity = await _unitOfWork.CutomerRepository.GetByIdAsync(id);
             if (entity == null)
             {
-                return NotFound(new { message = "User not found" });
+                return NotFound(new ErrorMessageDTO { Error = "User not found" });
             }
             try
             {
@@ -115,11 +120,11 @@ namespace User.WebApi.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = "Something went wrong" });
+                return BadRequest(new ErrorMessageDTO { Error = "Something went wrong" });
             }
 
 
-            return Ok(new { message = "User deleted successfully" });
+            return Ok(new ErrorMessageDTO { Message = "User deleted successfully" });
         }
 
     }
