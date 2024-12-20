@@ -23,7 +23,7 @@ namespace User.WebApi.Controllers
                 var CustomerData = mapper.Map<UserModal>(entity);
                 await _unitOfWork.CutomerRepository.AddAsync(CustomerData);
                 await _unitOfWork.CutomerRepository.SaveAsync();
-                return Ok(new { Message = "User created successfully", CustomerData });
+                return Ok(CustomerData);
             }
             return BadRequest(new ErrorMessageDTO { Error = "Email already registered" });
         }

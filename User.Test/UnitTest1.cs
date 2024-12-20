@@ -23,31 +23,42 @@ namespace User.UnitTests
             _mockMapper = new Mock<IMapper>();
             _controller = new UserController(_mockUnitOfWork.Object, _mockMapper.Object);
         }
-
-        private class ErrorMessage()
-        {
-            public string message { get; set; }
-        }
-
         [Fact]
-        public async Task AddCustomer_ReturnsOkResult_WithCustomerData()
+        public async Task AddCustomer_ReturnsOk_WhenEmailNotRegistered()
         {
             // Arrange
             var userDto = new UserDTO { Username = "TestUser", Email = "test@example.com", Password = "Password123", Address = "TestAddress" };
-            var userModel = new UserModal { UserId = 1, Username = "TestUser", Email = "test@example.com", Password = "Password123", Address = "TestAddress" };
+            var userModal = new UserModal { UserId = 1, Username = "User1", Email = "user1@example.com", Password = "Password123", Address = "Address1" }; // Example mapped entity
 
-            _mockMapper.Setup(m => m.Map<UserModal>(userDto)).Returns(userModel);
-            _mockUnitOfWork.Setup(u => u.CutomerRepository.AddAsync(userModel)).Returns(Task.CompletedTask);
-            _mockUnitOfWork.Setup(u => u.CutomerRepository.SaveAsync()).Returns(Task.CompletedTask);
-            _mockUnitOfWork.Setup(u => u.CutomerRepository.GetByIdAsync(1)).ReturnsAsync(userModel);
+            // Mocking the repository to return false for IsEmailRegistered, indicating that the email is not registered
+            _mockUnitOfWork.Setup(u => u.CutomerRepository.IsEmailRegistered(userDto.Email)).ReturnsAsync(true);
+            _mockMapper.Setup(m => m.Map<UserModal>(userDto)).Returns(userModal); // Mocking mapping
 
             // Act
             var result = await _controller.AddCustomer(userDto);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var returnedCustomer = Assert.IsType<UserModal>(okResult.Value);
-            Assert.Equal(userModel.UserId, returnedCustomer.UserId);
+            var returnedValue = Assert.IsType<UserModal>(okResult.Value);
+            Assert.Equal(userModal.Email, returnedValue.Email); 
+        }
+
+        [Fact]
+        public async Task AddCustomer_ReturnsBadRequest_WhenEmailAlreadyRegistered()
+        {
+            // Arrange
+            var userDto = new UserDTO { Username = "TestUser", Email = "test@example.com", Password = "Password123", Address = "TestAddress" };
+
+            // Mocking the repository to return true for IsEmailRegistered, indicating that the email is already registered
+            _mockUnitOfWork.Setup(u => u.CutomerRepository.IsEmailRegistered(userDto.Email)).ReturnsAsync(false);
+
+            // Act
+            var result = await _controller.AddCustomer(userDto);
+
+            // Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+            var returnedValue = Assert.IsType<ErrorMessageDTO>(badRequestResult.Value); 
+            Assert.Equal("Email already registered", returnedValue.Error);
         }
 
         [Fact]
@@ -104,8 +115,8 @@ namespace User.UnitTests
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var returnedValue = Assert.IsType<ErrorMessageDTO>(okResult.Value);
-            Assert.Equal("User deleted successfully", returnedValue.Message);
+            var returnedValue = Assert.IsType<string>(okResult.Value);
+            Assert.Equal( "User deleted successfully", returnedValue);
         }
 
         [Fact]
