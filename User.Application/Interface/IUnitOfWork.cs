@@ -2,7 +2,7 @@
 {
     public interface IUnitOfWork
     {
-        public IUserRepository CutomerRepository { get; }
+        public IUserRepository UserRepository { get; }
 
         public IProductService ProductService { get; }
     }

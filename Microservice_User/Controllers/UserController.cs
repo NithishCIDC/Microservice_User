@@ -14,29 +14,38 @@ namespace User.WebApi.Controllers
     {
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddUser([FromBody] UserDTO entity)
         {
-            if (await _unitOfWork.CutomerRepository.IsEmailRegistered(entity.Email))
+            if (await _unitOfWork.UserRepository.IsEmailRegistered(entity.Email))
             {
                 var UserData = entity.Adapt<UserModal>();
-                await _unitOfWork.CutomerRepository.AddAsync(UserData);
-                await _unitOfWork.CutomerRepository.SaveAsync();
+                await _unitOfWork.UserRepository.AddAsync(UserData);
+                await _unitOfWork.UserRepository.SaveAsync();
                 return Ok(UserData);
             }
             return BadRequest(new ErrorMessageDTO { Error = "Email already registered" });
         }
 
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUser()
         {
-            var customer = await _unitOfWork.CutomerRepository.GetAllAsync();
+            var customer = await _unitOfWork.UserRepository.GetAllAsync();
             return Ok(customer);
         }
 
         [HttpGet("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetUserByID(int id)
         {
-            var User = await _unitOfWork.CutomerRepository.GetByIdAsync(id);
+            if(id <= 0)
+            {
+                return BadRequest(new ErrorMessageDTO { Error = "Invalid ID" });
+            }
+            var User = await _unitOfWork.UserRepository.GetByIdAsync(id);
             if (User == null)
             {
                 return NotFound(new ErrorMessageDTO { Error = "User not found" });
@@ -45,12 +54,14 @@ namespace User.WebApi.Controllers
         }
 
         [HttpGet("WithProduct")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetWithProduct()
         {
             try
             {
                 var productData = await _unitOfWork.ProductService.GetProduct();
-                var customer = await _unitOfWork.CutomerRepository.GetAllAsync();
+                var customer = await _unitOfWork.UserRepository.GetAllAsync();
 
                 var combinedData = customer.Select(customer => new
                 {
@@ -72,12 +83,14 @@ namespace User.WebApi.Controllers
         }
 
         [HttpGet("WithProduct/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetUserwithProduct(int id)
         {
             try
             {
                 var productData = await _unitOfWork.ProductService.GetProductByCID(id);
-                var customer = await _unitOfWork.CutomerRepository.GetByIdAsync(id);
+                var customer = await _unitOfWork.UserRepository.GetByIdAsync(id);
 
                 var combinedData = new
                 {
@@ -100,12 +113,14 @@ namespace User.WebApi.Controllers
         }
 
         [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> EditUser([FromBody] UserModal entity)
         {
             try
             {
-                _unitOfWork.CutomerRepository.Update(entity);
-                await _unitOfWork.CutomerRepository.SaveAsync();
+                _unitOfWork.UserRepository.Update(entity);
+                await _unitOfWork.UserRepository.SaveAsync();
                 return Ok(entity);
             }
             catch (Exception)
@@ -115,18 +130,21 @@ namespace User.WebApi.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var entity = await _unitOfWork.CutomerRepository.GetByIdAsync(id);
+            var entity = await _unitOfWork.UserRepository.GetByIdAsync(id);
             if (entity == null)
             {
                 return NotFound(new ErrorMessageDTO { Error = "User not found" });
             }
             try
             {
-                _unitOfWork.CutomerRepository.Delete(entity);
+                _unitOfWork.UserRepository.Delete(entity);
                 _unitOfWork.ProductService.DeleteProduct(id);
-                await _unitOfWork.CutomerRepository.SaveAsync();
+                await _unitOfWork.UserRepository.SaveAsync();
             }
             catch (Exception)
             {

@@ -4,7 +4,6 @@ using User.Application.Interface;
 using User.Application.DTO;
 using User.Domain.Modal;
 using User.WebApi.Controllers;
-using Castle.Core.Resource;
 
 namespace User.UnitTests
 {
@@ -26,11 +25,11 @@ namespace User.UnitTests
             var userModal = new UserModal { UserId = 1, Username = "TestUser", Email = "test@example.com", Password = "Password123", Address = "TestAddress" };
 
             // Mocking the repository to return false for IsEmailRegistered, indicating that the email is not registered
-            _mockUnitOfWork.Setup(u => u.CutomerRepository.IsEmailRegistered(userDto.Email)).ReturnsAsync(true);
+            _mockUnitOfWork.Setup(u => u.UserRepository.IsEmailRegistered(userDto.Email)).ReturnsAsync(true);
 
             // Mock the repository methods for adding and saving the customer
-            _mockUnitOfWork.Setup(u => u.CutomerRepository.AddAsync(It.IsAny<UserModal>())).Returns(Task.CompletedTask);
-            _mockUnitOfWork.Setup(u => u.CutomerRepository.SaveAsync()).Returns(Task.CompletedTask);
+            _mockUnitOfWork.Setup(u => u.UserRepository.AddAsync(It.IsAny<UserModal>())).Returns(Task.CompletedTask);
+            _mockUnitOfWork.Setup(u => u.UserRepository.SaveAsync()).Returns(Task.CompletedTask);
 
             // Act
             var result = await _controller.AddUser(userDto);
@@ -49,7 +48,7 @@ namespace User.UnitTests
             var userDto = new UserDTO { Username = "TestUser", Email = "test@example.com", Password = "Password123", Address = "TestAddress" };
 
             // Mocking the repository to return true for IsEmailRegistered, indicating that the email is already registered
-            _mockUnitOfWork.Setup(u => u.CutomerRepository.IsEmailRegistered(userDto.Email)).ReturnsAsync(false);
+            _mockUnitOfWork.Setup(u => u.UserRepository.IsEmailRegistered(userDto.Email)).ReturnsAsync(false);
 
             // Act
             var result = await _controller.AddUser(userDto);
@@ -70,7 +69,7 @@ namespace User.UnitTests
                 new UserModal { UserId = 2, Username = "User2", Email = "user2@example.com", Password = "Password123", Address = "Address2" }
             };
 
-            _mockUnitOfWork.Setup(u => u.CutomerRepository.GetAllAsync()).ReturnsAsync(customers);
+            _mockUnitOfWork.Setup(u => u.UserRepository.GetAllAsync()).ReturnsAsync(customers);
 
             // Act
             var result = await _controller.GetUser();
@@ -87,7 +86,7 @@ namespace User.UnitTests
             // Arrange
             var customer = new UserModal { UserId = 1, Username = "User1", Email = "user1@example.com", Password = "Password123", Address = "Address1" };
 
-            _mockUnitOfWork.Setup(u => u.CutomerRepository.GetByIdAsync(1)).ReturnsAsync(customer);
+            _mockUnitOfWork.Setup(u => u.UserRepository.GetByIdAsync(1)).ReturnsAsync(customer);
 
             // Act
             var result = await _controller.GetUserByID(1);
@@ -102,7 +101,7 @@ namespace User.UnitTests
         public async Task GetCustomerByID_Returns_NotFoundResult()
         {
             // Arrange
-            _mockUnitOfWork.Setup(u => u.CutomerRepository.GetByIdAsync(2)).ReturnsAsync((UserModal)null);
+            _mockUnitOfWork.Setup(u => u.UserRepository.GetByIdAsync(2)).ReturnsAsync((UserModal)null);
 
             // Act
             var result = await _controller.GetUserByID(1);
@@ -119,7 +118,7 @@ namespace User.UnitTests
             // Arrange
             var user = new UserModal { UserId = 1, Username = "User1", Email = "user1@example.com", Password = "Password123", Address = "Address1" };
 
-            _mockUnitOfWork.Setup(u => u.CutomerRepository.Update(user));
+            _mockUnitOfWork.Setup(u => u.UserRepository.Update(user));
 
             var result = await _controller.EditUser(user);
 
@@ -133,10 +132,10 @@ namespace User.UnitTests
             // Arrange
             var customer = new UserModal { UserId = 1, Username = "User1", Email = "user1@example.com", Password = "Password123", Address = "Address1" };
 
-            _mockUnitOfWork.Setup(u => u.CutomerRepository.GetByIdAsync(1)).ReturnsAsync(customer);
-            _mockUnitOfWork.Setup(u => u.CutomerRepository.Delete(customer));
+            _mockUnitOfWork.Setup(u => u.UserRepository.GetByIdAsync(1)).ReturnsAsync(customer);
+            _mockUnitOfWork.Setup(u => u.UserRepository.Delete(customer));
             _mockUnitOfWork.Setup(u => u.ProductService.DeleteProduct(1));
-            _mockUnitOfWork.Setup(u => u.CutomerRepository.SaveAsync()).Returns(Task.CompletedTask);
+            _mockUnitOfWork.Setup(u => u.UserRepository.SaveAsync()).Returns(Task.CompletedTask);
 
             // Act
             var result = await _controller.DeleteUser(1);
@@ -151,14 +150,14 @@ namespace User.UnitTests
         public async Task DeleteCustomer_ReturnsNotFound_WhenUserDoesNotExist()
         {
             // Arrange
-            _mockUnitOfWork.Setup(u => u.CutomerRepository.GetByIdAsync(1)).ReturnsAsync((UserModal)null);
+            _mockUnitOfWork.Setup(u => u.UserRepository.GetByIdAsync(1)).ReturnsAsync((UserModal)null);
 
             // Act
             var result = await _controller.DeleteUser(1);
 
             // Assert
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
-            var returnedValue = Assert.IsType<ErrorMessageDTO>(notFoundResult.Value); // Using dynamic
+            var returnedValue = Assert.IsType<ErrorMessageDTO>(notFoundResult.Value);
             Assert.Equal("User not found", returnedValue.Error);
         }
     }
