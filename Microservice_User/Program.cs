@@ -81,6 +81,8 @@ builder.Host.UseSerilog();
 
 #endregion
 
+builder.Services.AddSignalR();
+
 builder.Services.AddAutoMapper(typeof(ApplicationMapper));
 
 builder.Services.AddControllers();

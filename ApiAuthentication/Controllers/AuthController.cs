@@ -20,8 +20,6 @@ namespace ApiAuthentication.Controllers
             {
                 var user = await dbContext.User.FirstOrDefaultAsync(user => user.Email == entity.Email && user.Password == entity.Password);
 
-
-
                 if (user is not null)
                 {
                     var tokenHandler = new JwtSecurityTokenHandler();
