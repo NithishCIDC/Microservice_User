@@ -4,6 +4,7 @@ using User.Domain.Modal;
 using User.Application.Interface;
 using User.Application.DTO;
 using Mapster;
+using Serilog;
 
 namespace User.WebApi.Controllers
 {
@@ -17,22 +18,45 @@ namespace User.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddUser([FromBody] UserDTO entity)
         {
-            if (await _unitOfWork.UserRepository.IsEmailRegistered(entity.Email))
+            try
             {
-                var UserData = entity.Adapt<UserModal>();
-                await _unitOfWork.UserRepository.AddAsync(UserData);
-                await _unitOfWork.UserRepository.SaveAsync();
-                return Ok(UserData);
+                Log.Information("User Registration Started, Checking Email is Valid");
+                if (await _unitOfWork.UserRepository.IsEmailRegistered(entity.Email))
+                {
+                    Log.Information("Email is validated");
+                    var UserData = entity.Adapt<UserModal>();
+                    await _unitOfWork.UserRepository.AddAsync(UserData);
+                    await _unitOfWork.UserRepository.SaveAsync();
+                    Log.Information("User Registered Successfully");
+                    return Ok(UserData);
+                }
+                Log.Warning("Email is already registered");
+                return BadRequest(new ErrorMessageDTO { Error = "Email already registered" });
             }
-            return BadRequest(new ErrorMessageDTO { Error = "Email already registered" });
+            catch (Exception)
+            {
+                Log.Error("Something went wrong, while registering User");
+                return BadRequest(new ErrorMessageDTO { Error = "Something went wrong, while registering User" });
+
+            }
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUser()
         {
-            var customer = await _unitOfWork.UserRepository.GetAllAsync();
-            return Ok(customer);
+            try
+            {
+                Log.Information("Getting all User Data");
+                var customer = await _unitOfWork.UserRepository.GetAllAsync();
+                Log.Information("Returning all User Data");
+                return Ok(customer);
+            }
+            catch (Exception)
+            {
+                Log.Error("Something went wrong, while getting User");
+                return BadRequest(new ErrorMessageDTO { Error = "Something went wrong, while getting User" });
+            }
         }
 
         [HttpGet("{id:int}")]
@@ -41,16 +65,28 @@ namespace User.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetUserByID(int id)
         {
-            if(id <= 0)
+            try
             {
-                return BadRequest(new ErrorMessageDTO { Error = "Invalid ID" });
+                Log.Information("Getting User Data by ID");
+                if (id <= 0)
+                {
+                    Log.Warning("Invalid ID");
+                    return BadRequest(new ErrorMessageDTO { Error = "Invalid ID" });
+                }
+                var User = await _unitOfWork.UserRepository.GetByIdAsync(id);
+                if (User == null)
+                {
+                    Log.Warning("User not found");
+                    return NotFound(new ErrorMessageDTO { Error = "User not found" });
+                }
+                Log.Information("Returning User Data");
+                return Ok(User);
             }
-            var User = await _unitOfWork.UserRepository.GetByIdAsync(id);
-            if (User == null)
+            catch (Exception)
             {
-                return NotFound(new ErrorMessageDTO { Error = "User not found" });
+                Log.Error("Something went wrong, while getting User by ID");
+                return BadRequest(new ErrorMessageDTO { Error = "Something went wrong, while getting User by ID" });
             }
-            return Ok(User);
         }
 
         [HttpGet("WithProduct")]
@@ -60,7 +96,9 @@ namespace User.WebApi.Controllers
         {
             try
             {
+                Log.Information("Getting Product Data");
                 var productData = await _unitOfWork.ProductService.GetProduct();
+                Log.Information("Getting User Data");
                 var customer = await _unitOfWork.UserRepository.GetAllAsync();
 
                 var combinedData = customer.Select(customer => new
@@ -74,10 +112,14 @@ namespace User.WebApi.Controllers
                         product.ProductName,
                     })
                 });
-
+                Log.Information("Returning User Data with Product");
                 return Ok(combinedData);
             }
-            catch (Exception) { return BadRequest(new ErrorMessageDTO { Error = "Product Database is not connected" }); }
+            catch (Exception)
+            {
+                Log.Error("Product Database is not connected");
+                return BadRequest(new ErrorMessageDTO { Error = "Internal Server Error" });
+            }
 
 
         }
@@ -89,6 +131,7 @@ namespace User.WebApi.Controllers
         {
             try
             {
+                Log.Information("Getting Product Data by Customer ID");
                 var productData = await _unitOfWork.ProductService.GetProductByCID(id);
                 var customer = await _unitOfWork.UserRepository.GetByIdAsync(id);
 
@@ -104,10 +147,12 @@ namespace User.WebApi.Controllers
                     })
 
                 };
+                Log.Information("Returning User Data with Product");
                 return Ok(combinedData);
             }
             catch (Exception)
             {
+                Log.Error("Product Database is not connected");
                 return BadRequest(new ErrorMessageDTO { Error = "Product Database is not connected" });
             }
         }
@@ -119,12 +164,15 @@ namespace User.WebApi.Controllers
         {
             try
             {
+                Log.Information("Updating User Data");
                 _unitOfWork.UserRepository.Update(entity);
                 await _unitOfWork.UserRepository.SaveAsync();
+                Log.Information("User Data Updated Successfully");
                 return Ok(entity);
             }
             catch (Exception)
             {
+                Log.Error("Something went wrong, while updating User");
                 return BadRequest(new ErrorMessageDTO { Error = "Something went wrong, while updating User" });
             }
         }
@@ -135,24 +183,27 @@ namespace User.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteUser(int id)
         {
+            Log.Information("Checking User in Database");
             var entity = await _unitOfWork.UserRepository.GetByIdAsync(id);
             if (entity == null)
             {
+                Log.Warning("User not found");
                 return NotFound(new ErrorMessageDTO { Error = "User not found" });
             }
             try
             {
+                Log.Information("Deleting User Data");
                 _unitOfWork.UserRepository.Delete(entity);
                 _unitOfWork.ProductService.DeleteProduct(id);
                 await _unitOfWork.UserRepository.SaveAsync();
+                Log.Information("User Data Deleted Successfully");
+                return Ok("User deleted successfully");
             }
             catch (Exception)
             {
+                Log.Error("Something went wrong");
                 return BadRequest(new ErrorMessageDTO { Error = "Something went wrong" });
             }
-
-
-            return Ok("User deleted successfully");
         }
 
     }

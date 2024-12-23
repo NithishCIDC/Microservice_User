@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System.Text;
 using User.Application.Interface;
 using User.Application.Mapper;
@@ -67,6 +68,16 @@ builder.Services.AddAuthorization(options =>
 
 #endregion
 
+#region Serilog
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+#endregion
+
 builder.Services.AddAutoMapper(typeof(ApplicationMapper));
 
 builder.Services.AddControllers();
@@ -82,6 +93,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("CORS_Policy");
+
+app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
 
