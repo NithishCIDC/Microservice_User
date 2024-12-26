@@ -27,7 +27,12 @@ namespace ApiAuthentication.Controllers
 
                     var tokenDescriptor = new SecurityTokenDescriptor
                     {
-                        Subject = new ClaimsIdentity([new Claim(ClaimTypes.Email, entity.Email), new Claim(ClaimTypes.Role, user.Role)]),
+                        Subject = new ClaimsIdentity(
+                        [
+                            new Claim(ClaimTypes.Email, entity.Email),
+                            new Claim(ClaimTypes.Role, user.Role),
+                            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString())
+                        ]),
                         Expires = DateTime.Now.AddMinutes(60),
                         Issuer = configuration["Jwt:Issuer"]!,
                         Audience = configuration["Jwt:Audience"]!,

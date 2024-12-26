@@ -2,10 +2,8 @@
 
 namespace User.Domain.Modal
 {
-    public class UserModal
+    public class UserModal : BaseModal
     {
-        [Key]
-        public int UserId { get; set; }
         public required string Username { get; set; }
         public string Role { get; set; } = "User";
         public required string Email { get; set; }

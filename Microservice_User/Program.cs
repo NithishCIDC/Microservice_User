@@ -1,13 +1,19 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
 using System.Text;
+using User.Application.DTO;
 using User.Application.Interface;
 using User.Application.Mapper;
+using User.Application.Validation;
+using User.Domain.Modal;
 using User.infrastructure.Data;
 using User.infrastructure.Repository;
+using User.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,19 +30,30 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 
 #endregion
 
-#region Generics and Unit of work
+#region Generics and Unit of work 
 
 builder.Services.AddTransient(typeof(IGenericRepository<>),typeof(GenericRepository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfwork>();
+builder.Services.AddScoped<IUserProcessor, UserProcessor>();
 
 #endregion
 
-#region AddHttpClient
+#region Fluent validation
+
+builder.Services.AddFluentValidationAutoValidation()
+    .AddFluentValidationClientsideAdapters()
+    .AddValidatorsFromAssemblyContaining<EditUserValidator>();
+
+#endregion
+
+#region AddHttpClient and Httpcontext
 
 builder.Services.AddHttpClient("Product", options =>
 {
     options.BaseAddress = new Uri("https://localhost:7115/api/");
 });
+
+builder.Services.AddHttpContextAccessor();
 
 #endregion
 

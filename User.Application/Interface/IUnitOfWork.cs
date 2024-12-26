@@ -1,6 +1,6 @@
 ﻿namespace User.Application.Interface
 {
-    public interface IUnitOfWork
+    public interface IUnitOfWork : IDisposable
     {
         public IUserRepository UserRepository { get; }
 

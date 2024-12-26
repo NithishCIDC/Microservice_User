@@ -4,32 +4,29 @@ using User.Application.Interface;
 using User.Application.DTO;
 using User.Domain.Modal;
 using User.WebApi.Controllers;
+using User.Services;
 
 namespace User.UnitTests
 {
     public class UserControllerTests
     {
-        private readonly Mock<IUnitOfWork> _mockUnitOfWork;
+        private readonly Mock<IUserProcessor> _mockUserProcessor;
         private readonly UserController _controller;
 
         public UserControllerTests()
         {
-            _mockUnitOfWork = new Mock<IUnitOfWork>();
-            _controller = new UserController(_mockUnitOfWork.Object);
+            _mockUserProcessor = new Mock<IUserProcessor>();
+            _controller = new UserController(_mockUserProcessor.Object);
         }
         [Fact]
         public async Task AddCustomer_ReturnsOk_WhenEmailNotRegistered()
         {
             // Arrange
-            var userDto = new UserDTO { Username = "TestUser", Email = "test@example.com", Password = "Password123", Address = "TestAddress" };
+            var userDto = new UserDTO { Username = "TestUser", Email = "test@gmail.com", Password = "Password123", Address = "TestAddress" };
             var userModal = new UserModal { UserId = 1, Username = "TestUser", Email = "test@example.com", Password = "Password123", Address = "TestAddress" };
 
-            // Mocking the repository to return false for IsEmailRegistered, indicating that the email is not registered
-            _mockUnitOfWork.Setup(u => u.UserRepository.IsEmailRegistered(userDto.Email)).ReturnsAsync(true);
-
             // Mock the repository methods for adding and saving the customer
-            _mockUnitOfWork.Setup(u => u.UserRepository.AddAsync(It.IsAny<UserModal>())).Returns(Task.CompletedTask);
-            _mockUnitOfWork.Setup(u => u.UserRepository.SaveAsync()).Returns(Task.CompletedTask);
+            _mockUserProcessor.Setup(u => u.AddUser(It.IsAny<UserDTO>())).ReturnsAsync(userModal);
 
             // Act
             var result = await _controller.AddUser(userDto);
@@ -47,8 +44,7 @@ namespace User.UnitTests
             // Arrange
             var userDto = new UserDTO { Username = "TestUser", Email = "test@example.com", Password = "Password123", Address = "TestAddress" };
 
-            // Mocking the repository to return true for IsEmailRegistered, indicating that the email is already registered
-            _mockUnitOfWork.Setup(u => u.UserRepository.IsEmailRegistered(userDto.Email)).ReturnsAsync(false);
+            _mockUserProcessor.Setup(u => u.AddUser(It.IsAny<UserDTO>())).ReturnsAsync((UserModal)null!);
 
             // Act
             var result = await _controller.AddUser(userDto);
@@ -65,14 +61,14 @@ namespace User.UnitTests
             // Arrange
             var customers = new List<UserModal>
             {
-                new UserModal { UserId = 1, Username = "User1", Email = "user1@example.com", Password = "Password123", Address = "Address1" },
-                new UserModal { UserId = 2, Username = "User2", Email = "user2@example.com", Password = "Password123", Address = "Address2" }
+                new() { UserId = 1, Username = "User1", Email = "user1@example.com", Password = "Password123", Address = "Address1" },
+                new() { UserId = 2, Username = "User2", Email = "user2@example.com", Password = "Password123", Address = "Address2" }
             };
 
-            _mockUnitOfWork.Setup(u => u.UserRepository.GetAllAsync()).ReturnsAsync(customers);
+            _mockUserProcessor.Setup(u => u.GetAllUser()).ReturnsAsync(customers);
 
             // Act
-            var result = await _controller.GetUser();
+            var result = await _controller.GetAllUser();
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -86,7 +82,7 @@ namespace User.UnitTests
             // Arrange
             var customer = new UserModal { UserId = 1, Username = "User1", Email = "user1@example.com", Password = "Password123", Address = "Address1" };
 
-            _mockUnitOfWork.Setup(u => u.UserRepository.GetByIdAsync(1)).ReturnsAsync(customer);
+            _mockUserProcessor.Setup(u => u.GetUserbyID(1)).ReturnsAsync(customer);
 
             // Act
             var result = await _controller.GetUserByID(1);
@@ -101,7 +97,7 @@ namespace User.UnitTests
         public async Task GetCustomerByID_Returns_NotFoundResult()
         {
             // Arrange
-            _mockUnitOfWork.Setup(u => u.UserRepository.GetByIdAsync(2)).ReturnsAsync((UserModal)null);
+            _mockUserProcessor.Setup(u => u.GetUserbyID(2)).ReturnsAsync((UserModal)null!);
 
             // Act
             var result = await _controller.GetUserByID(1);
@@ -118,7 +114,7 @@ namespace User.UnitTests
             // Arrange
             var user = new UserModal { UserId = 1, Username = "User1", Email = "user1@example.com", Password = "Password123", Address = "Address1" };
 
-            _mockUnitOfWork.Setup(u => u.UserRepository.Update(user));
+            _mockUserProcessor.Setup(u => u.EditUser(user));
 
             var result = await _controller.EditUser(user);
 
@@ -132,10 +128,7 @@ namespace User.UnitTests
             // Arrange
             var customer = new UserModal { UserId = 1, Username = "User1", Email = "user1@example.com", Password = "Password123", Address = "Address1" };
 
-            _mockUnitOfWork.Setup(u => u.UserRepository.GetByIdAsync(1)).ReturnsAsync(customer);
-            _mockUnitOfWork.Setup(u => u.UserRepository.Delete(customer));
-            _mockUnitOfWork.Setup(u => u.ProductService.DeleteProduct(1));
-            _mockUnitOfWork.Setup(u => u.UserRepository.SaveAsync()).Returns(Task.CompletedTask);
+            _mockUserProcessor.Setup(u => u.DeleteUser(1)).ReturnsAsync(true);
 
             // Act
             var result = await _controller.DeleteUser(1);
@@ -150,7 +143,7 @@ namespace User.UnitTests
         public async Task DeleteCustomer_ReturnsNotFound_WhenUserDoesNotExist()
         {
             // Arrange
-            _mockUnitOfWork.Setup(u => u.UserRepository.GetByIdAsync(1)).ReturnsAsync((UserModal)null);
+            _mockUserProcessor.Setup(u => u.DeleteUser(1)).ReturnsAsync(false);
 
             // Act
             var result = await _controller.DeleteUser(1);
