@@ -33,8 +33,4 @@
     <ProjectReference Include="..\User.Services\User.Services.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="NewFolder\" />
-  </ItemGroup>
-
 </Project>
