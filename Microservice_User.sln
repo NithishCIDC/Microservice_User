@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User.WebApi", "Microservice_User\User.WebApi.csproj", "{7C5A44B4-C0ED-4F07-86AA-20CA486ACE54}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User.WebApi", "User.WebApi\User.WebApi.csproj", "{7C5A44B4-C0ED-4F07-86AA-20CA486ACE54}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User.Domain", "User.Domain\User.Domain.csproj", "{36A51CAC-F67D-4D7B-A780-BD0C3A681BF0}"
 EndProject
