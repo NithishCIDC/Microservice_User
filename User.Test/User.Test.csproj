@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Microservice_User\User.WebApi.csproj" />
+    <ProjectReference Include="..\User.WebApi\User.WebApi.csproj" />
   </ItemGroup>
 
   <ItemGroup>

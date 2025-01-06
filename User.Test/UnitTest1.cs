@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using User.Application.Interface;
 using User.Application.DTO;
 using User.Domain.Modal;
-using User.WebApi.Controllers;
 using User.Services;
+using User.WebApi.Controllers;
 
 namespace User.UnitTests
 {
